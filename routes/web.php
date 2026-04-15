@@ -10,6 +10,12 @@ Route::get('/dashboard', function () {
     //return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Duy Long
 
+
+// Bích Ngân
+
+
+// Gia Toàn
 
 require __DIR__.'/auth.php';
