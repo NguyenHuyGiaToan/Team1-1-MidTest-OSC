@@ -49,7 +49,7 @@
             @forelse($products as $sp)
                 <div class="card">
                     <div class="card-img">
-                        //<a href="{{ route('sanpham.show', $sp->id) }}">
+                        <a href="{{ route('sanpham.show', $sp->id) }}">
                             <img src="{{ asset('storage/image/' . $sp->hinh_anh) }}" alt="{{ $sp->ten_san_pham }}">
                         </a>
                     </div>

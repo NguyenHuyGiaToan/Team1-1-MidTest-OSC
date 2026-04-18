@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AdminCayCanhController;
+use App\Http\Controllers\SanPhamController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/dashboard', function () {
-    //return view('dashboard');
+    return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
@@ -34,5 +37,4 @@ Route::get('/caycanh_manager', [App\Http\Controllers\AdminCayCanhController::cla
 
 
 require __DIR__.'/auth.php';
-use App\Http\Controllers\SanPhamController;
 

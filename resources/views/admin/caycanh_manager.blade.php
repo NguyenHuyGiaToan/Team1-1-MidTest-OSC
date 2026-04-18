@@ -39,7 +39,7 @@
                         <img src="{{ asset('storage/image/' . $item->hinh_anh) }}" width="50">
                     </td>
                     <td>
-                        <a class="btn btn-primary btn-sm" href="{{ url('chitiet/'.$item->id) }}">Xem</a>
+                        <a class="btn btn-primary btn-sm" href="{{ route('sanpham.show', $item->id) }}">Xem</a>
                         <form action="{{ route('caycanh_delete', $item->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
