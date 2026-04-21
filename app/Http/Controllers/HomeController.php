@@ -90,7 +90,7 @@ class HomeController extends Controller
         return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
     }
 
-    // 4. TRANG GIỎ HÀNG (Bạn đang thiếu hàm này)
+    // 4. TRANG GIỎ HÀNG
     public function cart()
     {
         $danhMucs = DB::table('danh_muc')->get();
@@ -104,7 +104,7 @@ class HomeController extends Controller
         return view('caycanh.cart', compact('cart', 'total', 'danhMucs'));
     }
 
-    // 5. XÓA SẢN PHẨM KHỎI GIỎ (Bạn đang thiếu hàm này)
+    // 5. XÓA SẢN PHẨM KHỎI GIỎ
     public function removeFromCart(Request $request)
     {
         if ($request->id) {
@@ -117,21 +117,35 @@ class HomeController extends Controller
         }
     }
 
-    // 6. XỬ LÝ ĐẶT HÀNG 
-    public function checkout(Request $request)
+    // 6. XỬ LÝ ĐẶT HÀNG VÀ GỬI EMAIL
+   public function checkout(Request $request)
     {
         $cart = session()->get('cart');
         if (!$cart) return redirect()->back();
 
-        // Lưu đơn hàng (Mặc định User Kiên có ID = 1 trong DB của bạn)
+        // 1. Kiểm tra đăng nhập và lấy thông tin người dùng hiện tại
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để đặt hàng.');
+        }
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user(); 
+
+        // 2. Tính tổng tiền từ giỏ hàng
+        $total = 0;
+        foreach($cart as $item) {
+            $total += $item['gia_ban'] * $item['so_luong'];
+        }
+
+        // 3. Lưu đơn hàng vào Database (Dùng đúng ID của người đang mua)
         $maDonHang = DB::table('don_hang')->insertGetId([
             'ngay_dat_hang' => now(),
             'tinh_trang' => 0,
             'hinh_thuc_thanh_toan' => $request->hinh_thuc_thanh_toan,
-            'user_id' => 1 
+            'user_id' => $user->id // Tự động lấy ID 3 nếu bạn đang đăng nhập Long
         ]);
 
-        // Lưu chi tiết đơn hàng
+        // 4. Lưu chi tiết đơn hàng
         foreach ($cart as $id => $item) {
             DB::table('chi_tiet_don_hang')->insert([
                 'ma_don_hang' => $maDonHang,
@@ -139,11 +153,18 @@ class HomeController extends Controller
                 'so_luong' => $item['so_luong'],
                 'don_gia' => $item['gia_ban']
             ]);
-        
         }
         
+        // 5. Chuẩn bị dữ liệu và GỬI EMAIL cho đúng người đó
+        $data = [
+            'cart' => $cart,
+            'total' => $total
+        ];
+
+        // Lệnh này sẽ gửi mail đến địa chỉ email trong DB của người đang đăng nhập
+        $user->notify(new OrderSuccessNotification($data));
 
         session()->forget('cart');
-        return redirect()->route('home')->with('success', 'Đặt hàng thành công! Cảm ơn bạn đã mua sắm.');
+        return redirect()->route('home')->with('success', 'Đặt hàng thành công! Thông báo đã được gửi đến email của bạn.');
     }
 }
