@@ -14,7 +14,6 @@ Route::get('/dashboard', function () {
 
 
 // Duy Long
-Route::get('/san-pham/{id}', [HomeController::class, 'show'])->name('sanpham.show');
 // Xem chi tiết sản phẩm
 Route::get('/san-pham/{id}', [HomeController::class, 'show'])->name('sanpham.show');
 // Thêm vào giỏ hàng
